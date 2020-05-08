@@ -27,7 +27,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     @IBOutlet weak var weatherIcon: UIImageView!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var temperatureLabel: UILabel!
-
+    @IBOutlet weak var switchForm: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,6 +65,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //Write the updateWeatherData method here:
     func updateWeatherData(json : JSON) {
         if let tempResult = json["main"]["temp"].double {
+            
             weatherDataModel.temperature = Int(tempResult)
             weatherDataModel.city = json["name"].stringValue
             weatherDataModel.condition = json["weather"][0]["id"].intValue
@@ -118,11 +119,31 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         getWeatherData(url: WEATHER_URL, parameters: params)
     }
     
+   
     //Write the PrepareForSegue Method here
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "changeCityName" {
             let destinationVC = segue.destination as! ChangeCityViewController
             destinationVC.delegate = self
         }
+    }
+    @IBAction func isPressed(_ sender: UISwitch) {
+        if sender.isOn {
+            celsiusToFarenheit()
+        } else {
+            farenheitToCelsius()
+        }
+    }
+    
+    func celsiusToFarenheit(){
+        //Fórmula - > (0 °C × 9/5) + 32
+        weatherDataModel.temperature =  Int(ceil(Double(weatherDataModel.temperature * 9/5) + 32))
+        updateUIWithWeatherData()
+    }
+    
+    func farenheitToCelsius() {
+        //Fórmula - > (32 °F − 32) × 5/9 = 0 °C
+        weatherDataModel.temperature =  Int(ceil(Double(weatherDataModel.temperature - 32) * 5/9))
+        updateUIWithWeatherData()
     }
 }
